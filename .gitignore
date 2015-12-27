@@ -1,0 +1,5 @@
+iron.json
+config/config.json
+config/config_queue.rb
+bundle/
+*.zip
