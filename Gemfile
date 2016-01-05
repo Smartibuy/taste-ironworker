@@ -1,5 +1,6 @@
 source "https://rubygems.org"
-ruby '2.1.2'
+ruby '1.9.3'
 
 gem 'aws-sdk'
 gem 'httparty'
+gem 'jieba-jruby'
