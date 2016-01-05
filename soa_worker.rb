@@ -1,9 +1,11 @@
+# encoding: UTF-8
+
 require_relative 'bundle/bundler/setup'
 require_relative 'config/config_queue.rb'
 require 'json'
 require 'aws-sdk'
 require 'httparty'
-require 'jieba'
+# require 'jieba'
 require 'uri'
 
 puts "Starting SOA_worker at #{Time.now}"
@@ -19,15 +21,16 @@ poller = Aws::SQS::QueuePoller.new(q_url)
 begin
   collect = {}
   poller.poll(wait_time_seconds:nil, idle_timeout:5) do |msg|
-    keyword = msg.body.to_s
-    keyword_arr = keyword.to_tags
-    keyword_arr.each do |key|
-      if collect[key] != nil
-        collect[key] = collect[key] + 1
-      else
-        collect[key] = 1
-      end
+    key = msg.body.to_s
+    puts key
+    # keyword_arr = keyword.to_tags
+    # keyword_arr.each do |key|
+    if collect[key] != nil
+      collect[key] = collect[key] + 1
+    else
+      collect[key] = 1
     end
+    # end
   end
   puts collect
 rescue Aws::SQS::Errors::ServiceError => e
