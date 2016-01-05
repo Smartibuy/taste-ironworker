@@ -3,7 +3,7 @@ require_relative 'config/config_queue.rb'
 require 'json'
 require 'aws-sdk'
 require 'httparty'
-
+require 'jieba'
 require 'uri'
 
 puts "Starting SOA_worker at #{Time.now}"
@@ -17,12 +17,19 @@ q_url = QUEUE_URL
 puts "Polling SQS for messages"
 poller = Aws::SQS::QueuePoller.new(q_url)
 begin
+  collect = {}
   poller.poll(wait_time_seconds:nil, idle_timeout:5) do |msg|
-    puts "MESSAGE: #{JSON.parse(msg.body)}"
-    req = JSON.parse(msg.body)
-    results = HTTParty.get URI.escape(req[0]['url'])
-    puts "RESULTS: #{results}\n\n"
+    keyword = msg.body.to_s
+    keyword_arr = keyword.to_tags
+    keyword_arr.each do |key|
+      if collect[key] != nil
+        collect[key] = collect[key] + 1
+      else
+        collect[key] = 1
+      end
+    end
   end
+  puts collect
 rescue Aws::SQS::Errors::ServiceError => e
   puts "ERROR FROM SQS: #{e}"
 end
