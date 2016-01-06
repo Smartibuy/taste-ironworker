@@ -33,7 +33,7 @@ begin
     end
   end
 
-  keyword_arr = HTTParty.post('http://smartibuyapidynamo.herokuapp.com/api/v1/save_hot_key_word',:body => {"cate_data" => collect}.to_json, :headers => {'Content-Type' => 'application/json'})
+  keyword_arr = HTTParty.post('http://smartibuyapidynamo.herokuapp.com/api/v1/save_hot_key_word',:body => {"key_data" => collect}.to_json, :headers => {'Content-Type' => 'application/json'})
 
   puts collect
 rescue Aws::SQS::Errors::ServiceError => e
