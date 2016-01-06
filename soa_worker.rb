@@ -21,17 +21,20 @@ poller = Aws::SQS::QueuePoller.new(q_url)
 begin
   collect = {}
   poller.poll(wait_time_seconds:nil, idle_timeout:5) do |msg|
-    key = msg.body.to_s
-    puts key
-    # keyword_arr = keyword.to_tags
-    # keyword_arr.each do |key|
-    if collect[key] != nil
-      collect[key] = collect[key] + 1
-    else
-      collect[key] = 1
+
+    keyword = msg.body.to_s
+    keyword_arr = HTTParty.post('http://workerapi.herokuapp.com/parse_keyword',:body => {"keyword" => keyword}.to_json, :headers => {'Content-Type' => 'application/json'})
+    keyword_arr.each do |key|
+      if collect[key] != nil
+        collect[key] = collect[key] + 1
+      else
+        collect[key] = 1
+      end
     end
-    # end
   end
+
+  keyword_arr = HTTParty.post('http://smartibuyapidynamo.herokuapp.com/api/v1/save_hot_key_word',:body => {"cate_data" => collect}.to_json, :headers => {'Content-Type' => 'application/json'})
+
   puts collect
 rescue Aws::SQS::Errors::ServiceError => e
   puts "ERROR FROM SQS: #{e}"
